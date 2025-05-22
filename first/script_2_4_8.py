@@ -20,7 +20,7 @@ try:
         EC.text_to_be_present_in_element((By.ID, "price"), "$100")
     )
 
-    # Нажимаем кнопку "Book"
+    # Нажимаем кнопку "Book"а
     browser.find_element(By.ID, "book").click()
 
     # считали x
