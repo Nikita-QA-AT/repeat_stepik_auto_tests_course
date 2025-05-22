@@ -9,7 +9,7 @@ def minus(a,b):
 def mul(a,b):
     return a*b
 
-
+print("proverka")
 
 if __name__ == '__main__':
     print(plus(2, 2))
