@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
 
 
 class BasePage():
@@ -55,7 +56,7 @@ class BasePage():
     def safe_find(self, locator, timeout=10, description="элемент"):
         try:
             element = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(locator),
+                EC.visibility_of_element_located(locator),
                 message=f"❌ Не найден {description} за {timeout} секунд. Локатор: {locator}"
             )
             print(f"✅ Найден элемент: {description}")
@@ -64,4 +65,25 @@ class BasePage():
             raise AssertionError(
                 f"❌ Ошибка: {description} не найден за {timeout} секунд. Проверь локатор: {locator}"
             ) from e
+
+    def safe_get_text(self, locator, timeout=10, description="элемент"):
+        try:
+            element = WebDriverWait(self.browser, timeout).until(
+                EC.visibility_of_element_located(locator),
+                message=f"❌ Не найден {description} за {timeout} секунд. Локатор: {locator}"
+            )
+            text = element.text  # важный момент — после явного ожидания
+            print(f"✅ Получен текст '{text}' из: {description}")
+            return text
+        except StaleElementReferenceException:
+            # попробуем повторно найти и взять текст (1 раз)
+            try:
+                element = WebDriverWait(self.browser, timeout).until(
+                    EC.visibility_of_element_located(locator)
+                )
+                return element.text
+            except Exception as e:
+                raise AssertionError(f"❌ {description} стал недоступен из-за перерисовки. Локатор: {locator}") from e
+
+
 
