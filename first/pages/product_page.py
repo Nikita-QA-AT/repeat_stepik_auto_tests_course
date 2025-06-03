@@ -26,3 +26,11 @@ class ProductPage(BasePage):
         print(f"total price = {total_price_in_basket}, product price = {product_price}")
         assert product_price == total_price_in_basket, f"expected product price {product_price} in total price, but got {total_price_in_basket} total price"
         print(f"Проверили, что после добавления одного товара в корзину цена в корзине становится равной цене товара")
+
+    def should_not_be_success_message(self):
+        assert self.is_not_element_present(*ProductPageLocators.MESSAGE_ABOUT_SUCCESS_ADD_PRODUCT_TO_BASKET), \
+            "Success message is presented, but should not be"
+
+    def should_success_message_disappear(self):
+        assert self.is_disappeared(*ProductPageLocators.MESSAGE_ABOUT_SUCCESS_ADD_PRODUCT_TO_BASKET), \
+            "Success message did not disappear, but it should"
