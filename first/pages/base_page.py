@@ -1,7 +1,6 @@
 import math
 from selenium.common.exceptions import NoAlertPresentException
-from ..conftest import browser
-from selenium.webdriver.common.by import By
+from conftest import browser
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -87,6 +86,29 @@ class BasePage():
             except Exception as e:
                 raise AssertionError(f"❌ {description} стал недоступен из-за перерисовки. Локатор: {locator}") from e
 
+    def fill_input(self, locator, text, description="поле ввода"):
+        try:
+            element = WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located(locator)
+            )
+            element.clear()
+            element.send_keys(text)
+            print(f"✅ Ввели текст '{text}' в {description}")
+        except TimeoutException:
+            assert False, f"❌ {description} не найдено на странице"
+
+    def click_element(self, locator, description="элемент"):
+        try:
+            element = WebDriverWait(self.browser, 10).until(
+                EC.element_to_be_clickable(locator)
+            )
+            element.click()
+            print(f"✅ Кликнули по {description}")
+        except TimeoutException:
+            assert False, f"❌ Не дождались кликабельности для {description}"
+
+
+
     def is_not_element_present(self, how, what, timeout=4):
         try:
             WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
@@ -116,3 +138,8 @@ class BasePage():
     def go_to_basket_page(self):
         login_link = self.browser.find_element(*BasePageLocators.GO_TO_BASKET_LINK)
         login_link.click()
+
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented," \
+                                                                     " probably unauthorised user"
+        print(f"✅ Проверили, что есть иконка авторизованного пользователя")
